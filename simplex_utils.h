@@ -4,7 +4,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <float.h>
+#include <cfloat>
+
+#include <optional>
 
 #include "Matrix.h"
 #include "Simplex.h"
@@ -12,7 +14,7 @@
 /** Function for printing errors */
 
 void impossible_case(std::string& msg) {
-    std::cout << "It is impossible to use Simlex method!\n";
+    std::cout << "It is impossible to use Simplex method!\n";
     std::cout << msg << std::endl;
 }
 
@@ -23,7 +25,7 @@ void swap_to_max_problem(std::vector<double>& z_row) {
         i = -1 * i;
 }
 
-void input_for_SM(
+bool input_for_SM(
         Matrix& matrix,
         const std::size_t number_of_vars,
         const std::size_t number_of_equations
@@ -35,7 +37,7 @@ void input_for_SM(
     if (problem != "max" && problem != "min") {
         std::string msg = "Only 'max' and 'min'!";
         impossible_case(msg);
-        return;
+        return false;
     }
 
     std::cout << "Enter coefficients c(i-th) in z function (0 if absent)\n";
@@ -43,7 +45,7 @@ void input_for_SM(
 
     z_row.resize(number_of_vars + number_of_equations, 0);
 
-    for (int i = 0; i < number_of_vars; ++i) {
+    for (std::size_t i = 0; i < number_of_vars; ++i) {
         std::cout << "c" << i + 1 << "=";
         std::cin >> z_row[i];
     }
@@ -53,15 +55,15 @@ void input_for_SM(
     if (problem == "max")
         swap_to_max_problem(z_row);
 
-    for (int i = 0; i < number_of_vars; ++i)
+    for (std::size_t i = 0; i < number_of_vars; ++i)
         matrix.table[matrix.n - 1][i] = z_row[i];
 
     std::cout << "Enter coefficients (0 if absent) for all constraints (left hand side)\n";
 
-    for (int i = 0; i < number_of_equations; ++i) {
+    for (std::size_t i = 0; i < number_of_equations; ++i) {
         std::cout << i + 1 << " constraint\n";
 
-        for (int j = 0; j < number_of_vars; ++j) {
+        for (std::size_t j = 0; j < number_of_vars; ++j) {
             std::cout << "c" << j + 1 << "=";
             std::cin >> matrix.table[i][j];
         }
@@ -73,6 +75,7 @@ void input_for_SM(
         if (sign != "<=") {
             std::string msg = "Sign " + sign + " is not allowed for this method";
             impossible_case(msg);
+            return false;
         }
 
         std::cout << "Enter right hand side of inequality\n";
@@ -83,6 +86,7 @@ void input_for_SM(
         if (RHS < 0) {
             std::string msg = std::to_string(RHS) + " is less than zero";
             impossible_case(msg);
+            return false;
         }
 
         matrix.table[i][matrix.m - 2] = RHS;
@@ -90,40 +94,43 @@ void input_for_SM(
 
     // Filling basic variables in the table
 
-    for (int i = number_of_vars; i < matrix.m - 2; ++i)
+    for (std::size_t i = number_of_vars; i < matrix.m - 2; ++i)
         matrix.table[i - number_of_vars][i] = 1;
-
 
     // Extra info for table
     matrix.list_of_all_vars.push_back("");
 
-    for (int i = 0; i < number_of_vars; ++i)
+    for (std::size_t i = 0; i < number_of_vars; ++i)
         matrix.list_of_all_vars.push_back("x" + std::to_string(i));
 
-    for (int i = 0; i < number_of_equations; ++i)
+    for (std::size_t i = 0; i < number_of_equations; ++i)
         matrix.list_of_all_vars.push_back("s" + std::to_string(i));
 
     matrix.list_of_all_vars.push_back("RHS");
     matrix.list_of_all_vars.push_back("Ratio");
 
-    for (int i = 0; i < number_of_equations; ++i)
+    for (std::size_t i = 0; i < number_of_equations; ++i)
         matrix.list_of_basic_vars.push_back("s" + std::to_string(i));
 
     matrix.list_of_basic_vars.push_back("z");
 
     std::cout << std::endl;
+    return true;
 }
 
-//Here are the functions for the main stage you need to implement
-////////////////////////////
+/**
+ * Function for finding min coefficients in z-row
+ * (must be negative) and in 'ratio' column
+ */
 
-// Function for finding min coefficients in z-row (must be negative) and in 'ratio' column
 int find_min_coeff(Matrix& matrix, bool in_row) {
-    double min_item = DBL_MAX;
+    auto min_item = DBL_MAX;
     int index = -1;
+
     if (in_row) {
-        for (int j = 0; j < matrix.m - 2; j++) {
+        for (std::size_t j = 0; j < matrix.m - 2; j++) {
             double c = matrix.table[matrix.n - 1][j];
+
             if (min_item > c) {
                 index = j;
                 min_item = c;
@@ -131,56 +138,76 @@ int find_min_coeff(Matrix& matrix, bool in_row) {
         }
         // find min coefficient in z row ( matrix.table[matrix.n - 1][i] )
     } else {
+<<<<<<< HEAD
         for (int j = 0; j < matrix.n - 1; j++) {
+=======
+        for (std::size_t j = 0; j < matrix.n; j++) {
+>>>>>>> de4461640900ba756d47739ea0cc98e4b251fece
             double c = matrix.table[j][matrix.m - 1];
+
             if (min_item > c) {
                 index = j;
                 min_item = c;
             }
         }
     }
+
     return index;
 }
 
-// Function for filling the last column (ratio)
+/** Function for filling the last column (ratio) */
+
 void calculate_ratio(Matrix& matrix, int min_var) {
     // 'ratio' is matrix.table[i][matrix.m - 1]
     // 'solution' is matrix.table[i][matrix.m - 2]
-    for (int i = 0; i < matrix.n; i++) {
+
+    for (std::size_t i = 0; i < matrix.n; i++)
         matrix.table[i][matrix.m - 1] = matrix.table[i][matrix.m - 2] / matrix.table[i][min_var];
-    }
 }
 
-// Divide current row by matrix.table[row][column] and subtract it from others rows
+/**
+ * Divide current row by matrix.table[row][column]
+ * and subtract it from others rows
+ */
+
 void make_column_basic(Matrix& matrix, int row, int column) {
     double pivot = matrix.table[row][column];
-    for (int i = 0; i < matrix.m - 1; i++) {
+
+    for (std::size_t i = 0; i < matrix.m - 1; i++)
         matrix.table[row][i] /= pivot;
+<<<<<<< HEAD
     }
     for (int k = 0; k < matrix.n; k++) {
         double factor = matrix.table[k][column];
         if (k != row) {
             for (int t = 0; t < matrix.m - 1; t++) {
+=======
+
+    for (std::size_t k = 0; k < matrix.n; k++) {
+        int factor = matrix.table[k][column];
+
+        if (k != row)
+            for (int t = 0; t < matrix.m - 1; t++)
+>>>>>>> de4461640900ba756d47739ea0cc98e4b251fece
                 matrix.table[k][t] = matrix.table[k][t] - factor * matrix.table[row][t];
-            }
-        }
     }
-    ///////////
 }
 
-// Writing the answer
 void substitute_into_answer(Simplex& answer, Matrix& table) {
     answer.z = table.table[table.n - 1][table.m - 2];
 
-    // answer.variables = ...
-    /////////////
+    for (std::size_t i = 0; i < answer.variables.size(); i++)
+        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];
 }
 
 bool condition_for_exit(Matrix& matrix) {
-    // z-row is matrix.table[matrix.n - 1][i]
-    ////////
+    for (std::size_t i = 0; i < matrix.m - 2; i++)
+        if (matrix.table[matrix.n - 1][i] < 0)
+            return false;
+
     return true;
 }
+
 
 // At the end of each iteration
 void swap_basic_var(Matrix& matrix, int old_var_pos, int new_var_pos) {
@@ -189,7 +216,7 @@ void swap_basic_var(Matrix& matrix, int old_var_pos, int new_var_pos) {
     matrix.list_of_basic_vars[old_var_pos] = matrix.list_of_all_vars[new_var_pos];
 }
 
-Simplex perform_simplex_method() {
+std::optional<Simplex> perform_simplex_method() {
     std::cout << "How many variables are in the task?\n";
     std::size_t number_of_vars;
     std::cin >> number_of_vars;
@@ -202,7 +229,8 @@ Simplex perform_simplex_method() {
     Matrix table(number_of_equations + 1, number_of_vars + number_of_equations + 2);
 
     // Input stage and considering impossible cases
-    input_for_SM(table, number_of_vars, number_of_equations);
+    if (!input_for_SM(table, number_of_vars, number_of_equations))
+        return std::nullopt;
 
     // Main stage of a function
 
@@ -221,16 +249,14 @@ Simplex perform_simplex_method() {
 
         swap_basic_var(table, min_var2, min_var1);
 
-        bool condition = condition_for_exit(table);
-        if (condition) {
+        if (condition_for_exit(table))
             break;
-        }
     }
 
     Simplex answer(number_of_vars);
     substitute_into_answer(answer, table);
 
-    return answer;
+    return std::make_optional(answer);
 }
 
 #endif //OPTIMIZATION_SIMPLEX_UTILS_H
