@@ -123,9 +123,9 @@ void swap_to_max_problem(std::vector<double>& z_row) {
  * (must be negative) and in 'ratio' column
  */
 
-[[nodiscard]] std::size_t find_min_coeff(const Matrix& matrix, const bool in_row) {
+[[nodiscard]] int find_min_coeff(const Matrix& matrix, const bool in_row) {
     auto min_item = DBL_MAX;
-    std::size_t index = -1;
+    int index = -1;
 
     if (in_row) {
         for (std::size_t j = 0; j < matrix.m - 2; j++) {
@@ -220,18 +220,16 @@ void swap_basic_var(Matrix& matrix, const std::size_t old_var_pos, const std::si
         return std::nullopt;
 
     // Main stage of a function
-
     std::size_t iteration = 0;
 
     while (true) {
-        std::cout << "Iteration " << iteration << std::endl;
-        iteration++;
+        std::cout << "Iteration " << iteration++ << std::endl;
         std::cout << table;
 
-        std::size_t min_var1 = find_min_coeff(table, false);
+        const int min_var1 = find_min_coeff(table, true);
         calculate_ratio(table, min_var1);
 
-        std::size_t min_var2 = find_min_coeff(table, true);
+        const int min_var2 = find_min_coeff(table, false);
         make_column_basic(table, min_var2, min_var1);
 
         swap_basic_var(table, min_var2, min_var1);
