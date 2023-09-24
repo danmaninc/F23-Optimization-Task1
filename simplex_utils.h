@@ -13,6 +13,7 @@
 void impossible_case(std::string& msg) {
     std::cout << "It is impossible to use Simlex method!\n";
     std::cout << msg << std::endl;
+    std::exit(0);
 }
 
 /** If we have min problem we can easily move to max problem */
@@ -42,7 +43,7 @@ void input_for_SM(
 
     z_row.resize(number_of_vars + number_of_equations, 0);
 
-    for (int i = 0; i < number_of_vars; ++i) {
+    for (std::size_t i = 0; i < number_of_vars; ++i) {
         std::cout << "c" << i + 1 << "=";
         std::cin >> z_row[i];
     }
@@ -52,15 +53,15 @@ void input_for_SM(
     if (problem == "max")
         swap_to_max_problem(z_row);
 
-    for (int i = 0; i < number_of_vars; ++i)
+    for (std::size_t i = 0; i < number_of_vars; ++i)
         matrix.table[matrix.n - 1][i] = z_row[i];
 
     std::cout << "Enter coefficients (0 if absent) for all constraints (left hand side)\n";
 
-    for (int i = 0; i < number_of_equations; ++i) {
+    for (std::size_t i = 0; i < number_of_equations; ++i) {
         std::cout << i + 1 << " constraint\n";
 
-        for (int j = 0; j < number_of_vars; ++j) {
+        for (std::size_t j = 0; j < number_of_vars; ++j) {
             std::cout << "c" << j + 1 << "=";
             std::cin >> matrix.table[i][j];
         }
@@ -89,23 +90,22 @@ void input_for_SM(
 
     // Filling basic variables in the table
 
-    for (int i = number_of_vars; i < matrix.m - 2; ++i)
+    for (std::size_t i = number_of_vars; i < matrix.m - 2; ++i)
         matrix.table[i - number_of_vars][i] = 1;
-
 
     // Extra info for table
     matrix.list_of_all_vars.push_back("");
 
-    for (int i = 0; i < number_of_vars; ++i)
+    for (std::size_t i = 0; i < number_of_vars; ++i)
         matrix.list_of_all_vars.push_back("x" + std::to_string(i));
 
-    for (int i = 0; i < number_of_equations; ++i)
+    for (std::size_t i = 0; i < number_of_equations; ++i)
         matrix.list_of_all_vars.push_back("s" + std::to_string(i));
 
     matrix.list_of_all_vars.push_back("RHS");
     matrix.list_of_all_vars.push_back("Ratio");
 
-    for (int i = 0; i < number_of_equations; ++i)
+    for (std::size_t i = 0; i < number_of_equations; ++i)
         matrix.list_of_basic_vars.push_back("s" + std::to_string(i));
 
     matrix.list_of_basic_vars.push_back("z");
