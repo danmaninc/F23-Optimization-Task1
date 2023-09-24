@@ -118,16 +118,19 @@ bool input_for_SM(
     return true;
 }
 
-//Here are the functions for the main stage you need to implement
-////////////////////////////
+/**
+ * Function for finding min coefficients in z-row
+ * (must be negative) and in 'ratio' column
+ */
 
-// Function for finding min coefficients in z-row (must be negative) and in 'ratio' column
 int find_min_coeff(Matrix& matrix, bool in_row) {
-    double min_item = DBL_MAX;
+    auto min_item = DBL_MAX;
     int index = -1;
+
     if (in_row) {
-        for (int j = 0; j < matrix.m - 2; j++) {
+        for (std::size_t j = 0; j < matrix.m - 2; j++) {
             double c = matrix.table[matrix.n - 1][j];
+
             if (min_item > c) {
                 index = j;
                 min_item = c;
@@ -135,63 +138,62 @@ int find_min_coeff(Matrix& matrix, bool in_row) {
         }
         // find min coefficient in z row ( matrix.table[matrix.n - 1][i] )
     } else {
-        for (int j = 0; j < matrix.n; j++) {
+        for (std::size_t j = 0; j < matrix.n; j++) {
             double c = matrix.table[j][matrix.m - 1];
+
             if (min_item > c) {
                 index = j;
                 min_item = c;
             }
         }
     }
+
     return index;
 }
 
-// Function for filling the last column (ratio)
+/** Function for filling the last column (ratio) */
+
 void calculate_ratio(Matrix& matrix, int min_var) {
     // 'ratio' is matrix.table[i][matrix.m - 1]
     // 'solution' is matrix.table[i][matrix.m - 2]
-    for (int i = 0; i < matrix.n; i++) {
+
+    for (std::size_t i = 0; i < matrix.n; i++)
         matrix.table[i][matrix.m - 1] = matrix.table[i][matrix.m - 2] / matrix.table[i][min_var];
-    }
 }
 
-// Divide current row by matrix.table[row][column] and subtract it from others rows
+/**
+ * Divide current row by matrix.table[row][column]
+ * and subtract it from others rows
+ */
+
 void make_column_basic(Matrix& matrix, int row, int column) {
     double pivot = matrix.table[row][column];
-    for (int i = 0; i < matrix.m - 1; i++) {
+
+    for (std::size_t i = 0; i < matrix.m - 1; i++)
         matrix.table[row][i] /= pivot;
-    }
-    for (int k = 0; k < matrix.n; k++) {
+
+    for (std::size_t k = 0; k < matrix.n; k++) {
         int factor = matrix.table[k][column];
-        if (k != row) {
-            for (int t = 0; t < matrix.m - 1; t++) {
+
+        if (k != row)
+            for (int t = 0; t < matrix.m - 1; t++)
                 matrix.table[k][t] = matrix.table[k][t] - factor * matrix.table[row][t];
-            }
-        }
     }
-    ///////////
 }
 
 void substitute_into_answer(Simplex& answer, Matrix& table) {
     answer.z = table.table[table.n - 1][table.m - 2];
 
-    for (int i = 0; i < answer.variables.size(); i++) {
-        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];
-    }
-    // answer.variables = ...
-    /////////////
+    for (std::size_t i = 0; i < answer.variables.size(); i++)
+        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];..
 }
 
 bool condition_for_exit(Matrix& matrix) {
-    bool exists = true;
-    for (int i = 0; i < matrix.m - 2; i++) {
-        if (matrix.table[matrix.n - 1][i] < 0) {
-            exists = false;
-        }
-    }
-    // z-row is matrix.table[matrix.n - 1][i]
-    ////////
-    return exists;
+    for (std::size_t i = 0; i < matrix.m - 2; i++)
+        if (matrix.table[matrix.n - 1][i] < 0)
+            return false;
+
+    return true;
 }
 
 
@@ -235,10 +237,8 @@ std::optional<Simplex> perform_simplex_method() {
 
         swap_basic_var(table, min_var2, min_var1);
 
-        bool condition = condition_for_exit(table);
-        if (condition) {
+        if (condition_for_exit(table))
             break;
-        }
     }
 
     Simplex answer(number_of_vars);
