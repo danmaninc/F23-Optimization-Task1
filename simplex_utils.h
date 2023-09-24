@@ -129,10 +129,13 @@ int find_min_coeff(Matrix& matrix, bool in_row) {
     return 0;
 }
 
-// Function for filling the last column
+// Function for filling the last column (ratio)
 void calculate_ratio(Matrix& matrix, int min_var) {
     // 'ratio' is matrix.table[i][matrix.m - 1]
-    //////////
+    // 'solution' is matrix.table[i][matrix.m - 2]
+    for (int i = 0; i < matrix.n; i++) {
+        matrix.table[i][matrix.m - 1] = matrix.table[i][matrix.m - 2] / matrix.table[i][min_var];
+    }
 }
 
 // Divide current row by matrix.table[row][column] and subtract it from others rows
