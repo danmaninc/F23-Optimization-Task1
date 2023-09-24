@@ -2,7 +2,6 @@
 
 #include "Simplex.h"
 #include "simplex_utils.h"
-// #include "tests.h"
 
 int main(int argc, char** argv) {
     auto answer = perform_simplex_method();
@@ -10,5 +9,5 @@ int main(int argc, char** argv) {
     if (answer.has_value())
         std::cout << answer.value();
 
-    return 0; //run_tests(argc, argv);
+    return 0;
 }

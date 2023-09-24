@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.23)
 project(optimization)
 
 set(CMAKE_CXX_STANDARD 23)

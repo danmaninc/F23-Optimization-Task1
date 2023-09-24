@@ -137,7 +137,7 @@ void swap_to_max_problem(std::vector<double>& z_row) {
             }
         }
     } else {
-        for (std::size_t j = 0; j < matrix.n; j++) {
+        for (std::size_t j = 0; j < matrix.n - 1; j++) {
             double c = matrix.table[j][matrix.m - 1];
 
             if (min_item > c) {
