@@ -185,7 +185,7 @@ void substitute_into_answer(Simplex& answer, Matrix& table) {
     answer.z = table.table[table.n - 1][table.m - 2];
 
     for (std::size_t i = 0; i < answer.variables.size(); i++)
-        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];..
+        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];
 }
 
 bool condition_for_exit(Matrix& matrix) {
