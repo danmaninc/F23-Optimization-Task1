@@ -10,7 +10,7 @@ struct Simplex {
     double z;
     std::vector<double> variables;
 
-    Simplex(const std::size_t size) {
+    explicit Simplex(const std::size_t size) {
         z = 0;
         variables.resize(size, 0);
     }

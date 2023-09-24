@@ -13,7 +13,7 @@
 
 /** Function for printing errors */
 
-void impossible_case(std::string& msg) {
+void impossible_case(const std::string& msg) {
     std::cout << "It is impossible to use Simplex method!\n";
     std::cout << msg << std::endl;
 }
@@ -25,7 +25,7 @@ void swap_to_max_problem(std::vector<double>& z_row) {
         i = -1 * i;
 }
 
-bool input_for_SM(
+[[nodiscard]] bool input_for_SM(
         Matrix& matrix,
         const std::size_t number_of_vars,
         const std::size_t number_of_equations
@@ -98,21 +98,21 @@ bool input_for_SM(
         matrix.table[i - number_of_vars][i] = 1;
 
     // Extra info for table
-    matrix.list_of_all_vars.push_back("");
+    matrix.list_of_all_vars.emplace_back("");
 
     for (std::size_t i = 0; i < number_of_vars; ++i)
-        matrix.list_of_all_vars.push_back("x" + std::to_string(i));
+        matrix.list_of_all_vars.emplace_back("x" + std::to_string(i));
 
     for (std::size_t i = 0; i < number_of_equations; ++i)
-        matrix.list_of_all_vars.push_back("s" + std::to_string(i));
+        matrix.list_of_all_vars.emplace_back("s" + std::to_string(i));
 
-    matrix.list_of_all_vars.push_back("RHS");
-    matrix.list_of_all_vars.push_back("Ratio");
+    matrix.list_of_all_vars.emplace_back("RHS");
+    matrix.list_of_all_vars.emplace_back("Ratio");
 
     for (std::size_t i = 0; i < number_of_equations; ++i)
-        matrix.list_of_basic_vars.push_back("s" + std::to_string(i));
+        matrix.list_of_basic_vars.emplace_back("s" + std::to_string(i));
 
-    matrix.list_of_basic_vars.push_back("z");
+    matrix.list_of_basic_vars.emplace_back("z");
 
     std::cout << std::endl;
     return true;
@@ -123,9 +123,9 @@ bool input_for_SM(
  * (must be negative) and in 'ratio' column
  */
 
-int find_min_coeff(Matrix& matrix, bool in_row) {
+[[nodiscard]] std::size_t find_min_coeff(const Matrix& matrix, const bool in_row) {
     auto min_item = DBL_MAX;
-    int index = -1;
+    std::size_t index = -1;
 
     if (in_row) {
         for (std::size_t j = 0; j < matrix.m - 2; j++) {
@@ -136,7 +136,6 @@ int find_min_coeff(Matrix& matrix, bool in_row) {
                 min_item = c;
             }
         }
-        // find min coefficient in z row ( matrix.table[matrix.n - 1][i] )
     } else {
         for (std::size_t j = 0; j < matrix.n; j++) {
             double c = matrix.table[j][matrix.m - 1];
@@ -153,7 +152,7 @@ int find_min_coeff(Matrix& matrix, bool in_row) {
 
 /** Function for filling the last column (ratio) */
 
-void calculate_ratio(Matrix& matrix, int min_var) {
+void calculate_ratio(Matrix& matrix, const std::size_t min_var) {
     // 'ratio' is matrix.table[i][matrix.m - 1]
     // 'solution' is matrix.table[i][matrix.m - 2]
 
@@ -166,29 +165,29 @@ void calculate_ratio(Matrix& matrix, int min_var) {
  * and subtract it from others rows
  */
 
-void make_column_basic(Matrix& matrix, int row, int column) {
+void make_column_basic(Matrix& matrix, const std::size_t row, const std::size_t column) {
     double pivot = matrix.table[row][column];
 
     for (std::size_t i = 0; i < matrix.m - 1; i++)
         matrix.table[row][i] /= pivot;
 
     for (std::size_t k = 0; k < matrix.n; k++) {
-        int factor = matrix.table[k][column];
+        double factor = matrix.table[k][column];
 
         if (k != row)
-            for (int t = 0; t < matrix.m - 1; t++)
+            for (std::size_t t = 0; t < matrix.m - 1; t++)
                 matrix.table[k][t] = matrix.table[k][t] - factor * matrix.table[row][t];
     }
 }
 
-void substitute_into_answer(Simplex& answer, Matrix& table) {
+void substitute_into_answer(Simplex& answer, const Matrix& table) {
     answer.z = table.table[table.n - 1][table.m - 2];
 
     for (std::size_t i = 0; i < answer.variables.size(); i++)
-        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];..
+        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];
 }
 
-bool condition_for_exit(Matrix& matrix) {
+[[nodiscard]] bool condition_for_exit(const Matrix& matrix) {
     for (std::size_t i = 0; i < matrix.m - 2; i++)
         if (matrix.table[matrix.n - 1][i] < 0)
             return false;
@@ -196,15 +195,15 @@ bool condition_for_exit(Matrix& matrix) {
     return true;
 }
 
+/** At the end of each iteration */
 
-// At the end of each iteration
-void swap_basic_var(Matrix& matrix, int old_var_pos, int new_var_pos) {
+void swap_basic_var(Matrix& matrix, const std::size_t old_var_pos, const std::size_t new_var_pos) {
     std::cout << matrix.list_of_all_vars[old_var_pos] << " leaves" << std::endl;
     std::cout << matrix.list_of_all_vars[new_var_pos] << " enters" << std::endl;
     matrix.list_of_basic_vars[old_var_pos] = matrix.list_of_all_vars[new_var_pos];
 }
 
-std::optional<Simplex> perform_simplex_method() {
+[[nodiscard]] std::optional<Simplex> perform_simplex_method() {
     std::cout << "How many variables are in the task?\n";
     std::size_t number_of_vars;
     std::cin >> number_of_vars;
@@ -229,10 +228,10 @@ std::optional<Simplex> perform_simplex_method() {
         iteration++;
         std::cout << table;
 
-        int min_var1 = find_min_coeff(table, false);
+        std::size_t min_var1 = find_min_coeff(table, false);
         calculate_ratio(table, min_var1);
 
-        int min_var2 = find_min_coeff(table, true);
+        std::size_t min_var2 = find_min_coeff(table, true);
         make_column_basic(table, min_var2, min_var1);
 
         swap_basic_var(table, min_var2, min_var1);

@@ -48,11 +48,11 @@ struct Matrix {
         for (auto& i : matrix.table) {
             out << matrix.list_of_basic_vars[counter++] << "\t";
 
-            for (int j = 0; j < i.size(); ++j)
+            for (double j : i)
                 out
                 << std::setprecision(NUMBERS_AFTER_DOT)
                 << std::fixed
-                << (std::abs(i[j]) < MIN_COUT ? ZERO : i[j])
+                << (std::abs(j) < MIN_COUT ? ZERO : j)
                 << "\t";
 
             out << std::endl << std::endl;
