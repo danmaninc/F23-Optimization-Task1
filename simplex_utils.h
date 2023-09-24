@@ -168,7 +168,7 @@ void make_column_basic(Matrix& matrix, int row, int column) {
     ///////////
 }
 
-void substitute_into_answer(Answer& answer, Matrix& table) {
+void substitute_into_answer(Simplex& answer, Matrix& table) {
     answer.z = table.table[table.n - 1][table.m - 2];
 
     for (int i = 0; i < answer.variables.size(); i++) {
