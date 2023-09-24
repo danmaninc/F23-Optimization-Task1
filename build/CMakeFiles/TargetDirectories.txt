@@ -1,0 +1,3 @@
+/home/paranid5/PROGRAMMING/plusi_ebanie/optimization/build/CMakeFiles/optimization.dir
+/home/paranid5/PROGRAMMING/plusi_ebanie/optimization/build/CMakeFiles/edit_cache.dir
+/home/paranid5/PROGRAMMING/plusi_ebanie/optimization/build/CMakeFiles/rebuild_cache.dir

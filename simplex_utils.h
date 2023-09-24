@@ -4,7 +4,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <float.h>
+#include <cfloat>
+
+#include <optional>
 
 #include "Matrix.h"
 #include "Simplex.h"
@@ -14,7 +16,6 @@
 void impossible_case(std::string& msg) {
     std::cout << "It is impossible to use Simlex method!\n";
     std::cout << msg << std::endl;
-    std::exit(0);
 }
 
 /** If we have min problem we can easily move to max problem */
@@ -24,7 +25,7 @@ void swap_to_max_problem(std::vector<double>& z_row) {
         i = -1 * i;
 }
 
-void input_for_SM(
+bool input_for_SM(
         Matrix& matrix,
         const std::size_t number_of_vars,
         const std::size_t number_of_equations
@@ -36,7 +37,7 @@ void input_for_SM(
     if (problem != "max" && problem != "min") {
         std::string msg = "Only 'max' and 'min'!";
         impossible_case(msg);
-        return;
+        return false;
     }
 
     std::cout << "Enter coefficients c(i-th) in z function (0 if absent)\n";
@@ -74,6 +75,7 @@ void input_for_SM(
         if (sign != "<=") {
             std::string msg = "Sign " + sign + " is not allowed for this method";
             impossible_case(msg);
+            return false;
         }
 
         std::cout << "Enter right hand side of inequality\n";
@@ -84,6 +86,7 @@ void input_for_SM(
         if (RHS < 0) {
             std::string msg = std::to_string(RHS) + " is less than zero";
             impossible_case(msg);
+            return false;
         }
 
         matrix.table[i][matrix.m - 2] = RHS;
@@ -112,6 +115,7 @@ void input_for_SM(
     matrix.list_of_basic_vars.push_back("z");
 
     std::cout << std::endl;
+    return true;
 }
 
 //Here are the functions for the main stage you need to implement
@@ -189,7 +193,7 @@ void swap_basic_var(Matrix& matrix, int old_var_pos, int new_var_pos) {
     matrix.list_of_basic_vars[old_var_pos] = matrix.list_of_all_vars[new_var_pos];
 }
 
-Simplex perform_simplex_method() {
+std::optional<Simplex> perform_simplex_method() {
     std::cout << "How many variables are in the task?\n";
     std::size_t number_of_vars;
     std::cin >> number_of_vars;
@@ -202,7 +206,8 @@ Simplex perform_simplex_method() {
     Matrix table(number_of_equations + 1, number_of_vars + number_of_equations + 2);
 
     // Input stage and considering impossible cases
-    input_for_SM(table, number_of_vars, number_of_equations);
+    if (!input_for_SM(table, number_of_vars, number_of_equations))
+        return std::nullopt;
 
     // Main stage of a function
 
@@ -230,7 +235,7 @@ Simplex perform_simplex_method() {
     Simplex answer(number_of_vars);
     substitute_into_answer(answer, table);
 
-    return answer;
+    return std::make_optional(answer);
 }
 
 #endif //OPTIMIZATION_SIMPLEX_UTILS_H

@@ -5,8 +5,10 @@
 #include "tests.h"
 
 int main(int argc, char** argv) {
-    Simplex answer = perform_simplex_method();
-    std::cout << answer;
+    auto answer = perform_simplex_method();
+
+    if (answer.has_value())
+        std::cout << answer.value();
 
     return run_tests(argc, argv);
 }

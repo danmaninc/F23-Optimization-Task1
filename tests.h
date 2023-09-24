@@ -4,8 +4,12 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-TEST(TestGroupName, Subtest_1) {
+TEST(SimplexTests, Test_1) {
     ASSERT_TRUE(1 == 1);
+}
+
+TEST(SimplexTests, Test_2) {
+    ASSERT_TRUE(2 == 2);
 }
 
 int run_tests(int argc, char** argv) {
