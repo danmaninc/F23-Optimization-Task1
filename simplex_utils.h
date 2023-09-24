@@ -12,7 +12,7 @@
 /** Function for printing errors */
 
 void impossible_case(std::string& msg) {
-    std::cout << "It is impossible to use Simlex method!\n";
+    std::cout << "It is impossible to use Simplex method!\n";
     std::cout << msg << std::endl;
     std::exit(0);
 }
