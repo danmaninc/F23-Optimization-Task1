@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <float.h>
 
 #include "Matrix.h"
 #include "Simplex.h"
@@ -118,15 +119,27 @@ void input_for_SM(
 
 // Function for finding min coefficients in z-row (must be negative) and in 'ratio' column
 int find_min_coeff(Matrix& matrix, bool in_row) {
-    // int min_item = ...
+    double min_item = DBL_MAX;
+    int index = -1;
     if (in_row) {
+        for (int j = 0; j < matrix.m - 2; j++) {
+            double c = matrix.table[matrix.n - 1][j];
+            if (min_item > c) {
+                index = j;
+                min_item = c;
+            }
+        }
         // find min coefficient in z row ( matrix.table[matrix.n - 1][i] )
+    } else {
+        for (int j = 0; j < matrix.n; j++) {
+            double c = matrix.table[j][matrix.m - 1];
+            if (min_item > c) {
+                index = j;
+                min_item = c;
+            }
+        }
     }
-    else {
-        // find min in 'ratio' column (matrix.table[i][matrix.m - 1])
-    }
-
-    return 0;
+    return index;
 }
 
 // Function for filling the last column (ratio)
@@ -139,7 +152,19 @@ void calculate_ratio(Matrix& matrix, int min_var) {
 }
 
 // Divide current row by matrix.table[row][column] and subtract it from others rows
-void make_column_basic(Matrix& matrix, const std::size_t row, const std::size_t column) {
+void make_column_basic(Matrix& matrix, int row, int column) {
+    double pivot = matrix.table[row][column];
+    for (int i = 0; i < matrix.m - 1; i++) {
+        matrix.table[row][i] /= pivot;
+    }
+    for (int k = 0; k < matrix.n; k++) {
+        int factor = matrix.table[k][column];
+        if (k != row) {
+            for (int t = 0; t < matrix.m - 1; t++) {
+                matrix.table[k][t] = matrix.table[k][t] - factor * matrix.table[row][t];
+            }
+        }
+    }
     ///////////
 }
 
