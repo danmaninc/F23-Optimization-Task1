@@ -1,0 +1,7 @@
+# ninja log v5
+0	512	1695549984868880036	CMakeFiles/optimization.dir/main.cpp.o	af17d15f556a86d1
+513	639	1695549984996880898	optimization	7defd3b29471cd38
+1	998	1695551649992739343	CMakeFiles/optimization.dir/main.cpp.o	af17d15f556a86d1
+1	964	1695551712871864221	CMakeFiles/optimization.dir/main.cpp.o	af17d15f556a86d1
+1	1007	1695551792895841214	CMakeFiles/optimization.dir/main.cpp.o	af17d15f556a86d1
+1007	1141	1695551793031847973	optimization	7defd3b29471cd38
