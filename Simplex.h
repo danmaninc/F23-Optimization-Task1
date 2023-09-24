@@ -19,7 +19,7 @@ struct Simplex {
         out << "Value of z: " << answer.z << std::endl;
 
         for (int i = 0; i < answer.variables.size(); ++i)
-            out << "x" << i << " = " << answer.variables[i] << std::endl;
+            out << "x" << i + 1 << " = " << answer.variables[i] << std::endl;
 
         out << std::endl;
         return out;

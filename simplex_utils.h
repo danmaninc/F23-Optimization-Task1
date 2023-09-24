@@ -101,16 +101,16 @@ void swap_to_max_problem(std::vector<double>& z_row) {
     matrix.list_of_all_vars.emplace_back("");
 
     for (int i = 0; i < number_of_vars; ++i)
-        matrix.list_of_all_vars.emplace_back("x" + std::to_string(i));
+        matrix.list_of_all_vars.emplace_back("x" + std::to_string(i + 1));
 
     for (int i = 0; i < number_of_equations; ++i)
-        matrix.list_of_all_vars.emplace_back("s" + std::to_string(i));
+        matrix.list_of_all_vars.emplace_back("s" + std::to_string(i + 1));
 
     matrix.list_of_all_vars.emplace_back("RHS");
     matrix.list_of_all_vars.emplace_back("Ratio");
 
     for (int i = 0; i < number_of_equations; ++i)
-        matrix.list_of_basic_vars.emplace_back("s" + std::to_string(i));
+        matrix.list_of_basic_vars.emplace_back("s" + std::to_string(i + 1));
 
     matrix.list_of_basic_vars.emplace_back("z");
 
@@ -180,11 +180,18 @@ void make_column_basic(Matrix& matrix, const int row, const int column) {
     }
 }
 
-void substitute_into_answer(Simplex& answer, const Matrix& table) {
-    answer.z = table.table[table.n - 1][table.m - 2];
+void substitute_into_answer(Simplex& answer, const Matrix& matrix) {
+    answer.z = matrix.table[matrix.n - 1][matrix.m - 2];
 
-    for (int i = 0; i < answer.variables.size(); i++)
-        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];
+//    for (int i = 0; i < answer.variables.size(); i++)
+//        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];
+
+    for (int i = 0; i < matrix.list_of_basic_vars.size(); i++) {
+        if (matrix.list_of_basic_vars.at(i)[0] != 's' && matrix.list_of_basic_vars.at(i)[0] != 'z') {
+            int index = matrix.list_of_basic_vars.at(i)[1] - '0' - 1;
+            answer.variables[index] = matrix.table.at(i)[matrix.m - 2];
+        }
+    }
 }
 
 [[nodiscard]] bool condition_for_exit(const Matrix& matrix) {
@@ -198,9 +205,9 @@ void substitute_into_answer(Simplex& answer, const Matrix& table) {
 /** At the end of each iteration */
 
 void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos) {
-    std::cout << matrix.list_of_all_vars[old_var_pos] << " leaves" << std::endl;
-    std::cout << matrix.list_of_all_vars[new_var_pos] << " enters" << std::endl;
-    matrix.list_of_basic_vars[old_var_pos] = matrix.list_of_all_vars[new_var_pos];
+    std::cout << matrix.list_of_basic_vars[old_var_pos] << " leaves" << std::endl;
+    std::cout << matrix.list_of_all_vars[new_var_pos + 1] << " enters" << std::endl;
+    matrix.list_of_basic_vars[old_var_pos] = matrix.list_of_all_vars[new_var_pos + 1];
 }
 
 [[nodiscard]] std::optional<Simplex> perform_simplex_method() {
@@ -222,11 +229,13 @@ void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos
     // Main stage of a function
 
     int iteration = 0;
+    std::cout << "Iteration " << iteration << std::endl;
+    iteration++;
+    std::cout << table;
 
     while (true) {
-        std::cout << "Iteration " << iteration << std::endl;
-        iteration++;
-        std::cout << table;
+        if (condition_for_exit(table))
+            break;
 
         int min_var1 = find_min_coeff(table, true);
         calculate_ratio(table, min_var1);
@@ -236,8 +245,10 @@ void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos
 
         swap_basic_var(table, min_var2, min_var1);
 
-        if (condition_for_exit(table))
-            break;
+        std::cout << std::endl;
+        std::cout << "Iteration " << iteration << std::endl;
+        iteration++;
+        std::cout << table;
     }
 
     Simplex answer(number_of_vars);
