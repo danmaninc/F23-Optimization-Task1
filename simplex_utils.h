@@ -131,7 +131,7 @@ int find_min_coeff(Matrix& matrix, bool in_row) {
         }
         // find min coefficient in z row ( matrix.table[matrix.n - 1][i] )
     } else {
-        for (int j = 0; j < matrix.n; j++) {
+        for (int j = 0; j < matrix.n - 1; j++) {
             double c = matrix.table[j][matrix.m - 1];
             if (min_item > c) {
                 index = j;
@@ -158,7 +158,7 @@ void make_column_basic(Matrix& matrix, int row, int column) {
         matrix.table[row][i] /= pivot;
     }
     for (int k = 0; k < matrix.n; k++) {
-        int factor = matrix.table[k][column];
+        double factor = matrix.table[k][column];
         if (k != row) {
             for (int t = 0; t < matrix.m - 1; t++) {
                 matrix.table[k][t] = matrix.table[k][t] - factor * matrix.table[row][t];
@@ -213,10 +213,10 @@ Simplex perform_simplex_method() {
         iteration++;
         std::cout << table;
 
-        int min_var1 = find_min_coeff(table, false);
+        int min_var1 = find_min_coeff(table, true);
         calculate_ratio(table, min_var1);
 
-        int min_var2 = find_min_coeff(table, true);
+        int min_var2 = find_min_coeff(table, false);
         make_column_basic(table, min_var2, min_var1);
 
         swap_basic_var(table, min_var2, min_var1);
