@@ -140,7 +140,7 @@ void swap_to_max_problem(std::vector<double>& z_row) {
         for (int j = 0; j < matrix.n - 1; j++) {
             double c = matrix.table[j][matrix.m - 1];
 
-            if (min_item > c) {
+            if (min_item > c && c >= 0) {
                 index = j;
                 min_item = c;
             }
@@ -156,7 +156,7 @@ void calculate_ratio(Matrix& matrix, const int min_var) {
     // 'ratio' is matrix.table[i][matrix.m - 1]
     // 'solution' is matrix.table[i][matrix.m - 2]
 
-    for (int i = 0; i < matrix.n; i++)
+    for (int i = 0; i < matrix.n - 1; i++)
         matrix.table[i][matrix.m - 1] = matrix.table[i][matrix.m - 2] / matrix.table[i][min_var];
 }
 
