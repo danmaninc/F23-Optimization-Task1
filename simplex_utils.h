@@ -14,7 +14,7 @@
 /** Function for printing errors */
 
 void impossible_case(std::string& msg) {
-    std::cout << "It is impossible to use Simlex method!\n";
+    std::cout << "It is impossible to use Simplex method!\n";
     std::cout << msg << std::endl;
 }
 
@@ -172,19 +172,28 @@ void make_column_basic(Matrix& matrix, int row, int column) {
     ///////////
 }
 
-// Writing the answer
 void substitute_into_answer(Simplex& answer, Matrix& table) {
     answer.z = table.table[table.n - 1][table.m - 2];
 
+    for (int i = 0; i < answer.variables.size(); i++) {
+        answer.variables[i] = table.table[table.n - answer.variables.size()][table.m - 2];
+    }
     // answer.variables = ...
     /////////////
 }
 
 bool condition_for_exit(Matrix& matrix) {
+    bool exists = true;
+    for (int i = 0; i < matrix.m - 2; i++) {
+        if (matrix.table[matrix.n - 1][i] < 0) {
+            exists = false;
+        }
+    }
     // z-row is matrix.table[matrix.n - 1][i]
     ////////
-    return true;
+    return exists;
 }
+
 
 // At the end of each iteration
 void swap_basic_var(Matrix& matrix, int old_var_pos, int new_var_pos) {
