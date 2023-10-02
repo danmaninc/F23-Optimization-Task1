@@ -39,8 +39,10 @@ struct Matrix {
     }
 
     friend std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
-        for (auto& i : matrix.list_of_all_vars)
-            out << i << " " << "\t";
+        out << matrix.list_of_all_vars[0] << " " << "\t";
+
+        for (int i = 1; i < matrix.list_of_all_vars.size(); i++)
+            out << matrix.list_of_all_vars.at(i) << " " << "\t";
 
         out << std::endl;
         int counter = 0;

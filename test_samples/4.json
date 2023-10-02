@@ -1,0 +1,11 @@
+{
+  "number_of_vars": 2,
+  "number_of_equations": 3,
+  "problem": "min",
+  "z_row": [-2, 3],
+  "matrix": [
+    [1, -2, 10],
+    [-2, 1, 5],
+    [3, 5, 40]
+  ]
+}
