@@ -34,17 +34,7 @@ bool check_double_vector_equality(
     return true;
 }
 
-void print_vec(const std::vector<double>& first) {
-    for (auto& e : first)
-        std::cout << e << " ";
-    std::cout << std::endl;
-}
-
-inline void perform_test(
-        const char* const test_sample_path,
-        const double expected_z,
-        std::vector<double>&& expected_vars
-) {
+inline std::tuple<Matrix, int, bool> make_test_data(const char* const test_sample_path) {
     std::ifstream in(test_sample_path);
     const auto data = json::parse(in);
 
@@ -67,61 +57,76 @@ inline void perform_test(
     set_basic_vars(mtx, number_of_vars);
     set_presentation(mtx, number_of_vars, number_of_equations);
 
+    return std::make_tuple(mtx, number_of_vars, is_max_problem);
+}
+
+inline void perform_solution_test(
+        const char* const test_sample_path,
+        const double expected_z,
+        std::vector<double>&& expected_vars
+) {
+    auto [mtx, number_of_vars, is_max_problem] = make_test_data(test_sample_path);
     auto ans = calculate_answer(std::move(mtx), number_of_vars, is_max_problem, false).value();
 
-    std::cout << ans.z << std::endl;
     ASSERT_TRUE(std::abs(ans.z - expected_z) < CMP_PRECISION);
-
-    print_vec(ans.variables);
     ASSERT_TRUE(check_double_vector_equality(ans.variables, expected_vars));
 }
 
+inline void perform_no_solution_test(const char* const test_sample_path) {
+    auto [mtx, number_of_vars, is_max_problem] = make_test_data(test_sample_path);
+    ASSERT_FALSE(calculate_answer(std::move(mtx), number_of_vars, is_max_problem, false).has_value());
+}
+
 TEST(SimplexTests, Test_1) {
-    perform_test(
+    perform_solution_test(
             "../test_samples/1.json",
             16.94,
-            std::vector<double> { 0, 6.11765, 1.41176 }
+            std::vector<double>{0, 6.11765, 1.41176}
     );
 }
 
 TEST(SimplexTests, Test_2) {
-    perform_test(
+    perform_solution_test(
             "../test_samples/2.json",
             -6,
-            std::vector<double> { 0, 0, 6 }
+            std::vector<double>{0, 0, 6}
     );
 }
 
 TEST(SimplexTests, Test_3) {
-    perform_test(
+    perform_solution_test(
             "../test_samples/3.json",
             19.615,
-            std::vector<double> { 1.154, 7.308 }
+            std::vector<double>{1.154, 7.308}
     );
 }
 
 TEST(SimplexTests, Test_4) {
-    perform_test(
+    perform_solution_test(
             "../test_samples/4.json",
             -20.9,
-            std::vector<double> { 11.82, 0.9 }
+            std::vector<double>{11.82, 0.9}
     );
 }
 
 TEST(SimplexTests, Test_5) {
-    perform_test(
+    perform_solution_test(
             "../test_samples/5.json",
             34.96,
-            std::vector<double> { 0.38, 0, 0, 1.63, 2.33 }
+            std::vector<double>{0.38, 0, 0, 1.63, 2.33}
     );
 }
 
 TEST(SimplexTests, Test_6) {
-    perform_test(
+    perform_solution_test(
             "../test_samples/6.json",
             -6.19,
-            std::vector<double> { 0, 0, 1.24, 0, 0 }
+            std::vector<double>{0, 0, 1.24, 0, 0}
     );
+}
+
+TEST(SimplexTests, Test_7) {
+    perform_no_solution_test("../test_samples/7.json");
 }
 
 int run_tests(int argc, char** const argv) {

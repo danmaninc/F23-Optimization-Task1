@@ -261,9 +261,11 @@ void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos
             break;
 
         int min_var1 = find_min_coeff(table, true);
+        if (min_var1 < 0) return std::nullopt;
         calculate_ratio(table, min_var1);
 
         int min_var2 = find_min_coeff(table, false);
+        if (min_var2 < 0) return std::nullopt;
         make_column_basic(table, min_var2, min_var1);
 
         swap_basic_var(table, min_var2, min_var1, verbose);
