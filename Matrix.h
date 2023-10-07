@@ -52,10 +52,9 @@ struct Matrix {
 
             for (double j : i)
                 out
-                //<< std::setprecision(NUMBERS_AFTER_DOT)
-                //<< std::fixed
-                //<< (std::abs(j) < MIN_COUT ? ZERO : j)
-                << j
+                << std::setprecision(NUMBERS_AFTER_DOT)
+                << std::fixed
+                << (std::abs(j) < MIN_COUT ? ZERO : j)
                 << "\t";
 
             out << std::endl << std::endl;
