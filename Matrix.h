@@ -10,7 +10,7 @@ const double MIN_COUT = 0.05;
 
 const double ZERO = 0;
 
-const int NUMBERS_AFTER_DOT = 1;
+const int NUMBERS_AFTER_DOT = 2;
 
 struct Matrix {
     std::size_t n;
@@ -52,9 +52,10 @@ struct Matrix {
 
             for (double j : i)
                 out
-                << std::setprecision(NUMBERS_AFTER_DOT)
-                << std::fixed
-                << (std::abs(j) < MIN_COUT ? ZERO : j)
+                //<< std::setprecision(NUMBERS_AFTER_DOT)
+                //<< std::fixed
+                //<< (std::abs(j) < MIN_COUT ? ZERO : j)
+                << j
                 << "\t";
 
             out << std::endl << std::endl;

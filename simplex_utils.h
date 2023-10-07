@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <cfloat>
-
 #include <optional>
 
 #include "Matrix.h"
@@ -148,32 +147,36 @@ void set_presentation(Matrix& matrix, const int number_of_vars, const int number
     return std::make_optional(std::make_tuple(matrix, number_of_vars, number_of_equations, is_max_problem));
 }
 
-/**
- * Function for finding min coefficients in z-row
- * (must be negative) and in 'ratio' column
- */
+/** Function for finding min coefficients in z-row */
 
-[[nodiscard]] int find_min_coeff(const Matrix& matrix, const bool in_row) {
+[[nodiscard]] int find_min_coeff_z(const Matrix& matrix) {
     auto min_item = DBL_MAX;
     int index = -1;
 
-    if (in_row) {
-        for (int j = 0; j < matrix.m - 2; j++) {
-            double c = matrix.table[matrix.n - 1][j];
+    for (int j = 0; j < matrix.m - 2; j++) {
+        const auto c = matrix.table[matrix.n - 1][j];
 
-            if (min_item > c) {
-                index = j;
-                min_item = c;
-            }
+        if (min_item > c) {
+            index = j;
+            min_item = c;
         }
-    } else {
-        for (int j = 0; j < matrix.n - 1; j++) {
-            double c = matrix.table[j][matrix.m - 1];
+    }
 
-            if (min_item > c && c >= 0) {
-                index = j;
-                min_item = c;
-            }
+    return index;
+}
+
+/** Function for finding min coefficients in in 'ratio' column */
+
+[[nodiscard]] int find_min_coeff_ratio(const Matrix& matrix, const int min_var1) {
+    auto min_item = DBL_MAX;
+    int index = -1;
+
+    for (int j = 0; j < matrix.n - 1; j++) {
+        const auto c = matrix.table[j][matrix.m - 1];
+
+        if (min_item > c && c >= 0 && matrix.table[j][min_var1] >= 0) {
+            index = j;
+            min_item = c;
         }
     }
 
@@ -196,17 +199,19 @@ void calculate_ratio(Matrix& matrix, const int min_var) {
  */
 
 void make_column_basic(Matrix& matrix, const int row, const int column) {
-    double pivot = matrix.table[row][column];
+    const auto pivot = matrix.table[row][column];
 
     for (int i = 0; i < matrix.m - 1; i++)
         matrix.table[row][i] /= pivot;
 
     for (int k = 0; k < matrix.n; k++) {
-        double factor = matrix.table[k][column];
+        if (k == row)
+            continue;
 
-        if (k != row)
-            for (int t = 0; t < matrix.m - 1; t++)
-                matrix.table[k][t] = matrix.table[k][t] - factor * matrix.table[row][t];
+        const auto factor = matrix.table[k][column];
+
+        for (int t = 0; t < matrix.m - 1; t++)
+            matrix.table[k][t] -= factor * matrix.table[row][t];
     }
 }
 
@@ -215,9 +220,9 @@ void substitute_into_answer(Simplex& answer, const Matrix& matrix, const bool is
     answer.z = is_max_problem ? ans : -ans;
 
     for (int i = 0; i < matrix.list_of_basic_vars.size(); i++) {
-        if (matrix.list_of_basic_vars.at(i)[0] != 's' && matrix.list_of_basic_vars.at(i)[0] != 'z') {
-            int index = matrix.list_of_basic_vars.at(i)[1] - '0' - 1;
-            answer.variables[index] = matrix.table.at(i)[matrix.m - 2];
+        if (matrix.list_of_basic_vars[i][0] != 's' && matrix.list_of_basic_vars[i][0] != 'z') {
+            const int index = matrix.list_of_basic_vars[i][1] - '0' - 1;
+            answer.variables[index] = matrix.table[i][matrix.m - 2];
         }
     }
 }
@@ -260,11 +265,11 @@ void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos
         if (condition_for_exit(table))
             break;
 
-        int min_var1 = find_min_coeff(table, true);
+        const int min_var1 = find_min_coeff_z(table);
         if (min_var1 < 0) return std::nullopt;
         calculate_ratio(table, min_var1);
 
-        int min_var2 = find_min_coeff(table, false);
+        const int min_var2 = find_min_coeff_ratio(table, min_var1);
         if (min_var2 < 0) return std::nullopt;
         make_column_basic(table, min_var2, min_var1);
 
