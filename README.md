@@ -1,8 +1,14 @@
 # Simplex Algorithm
 
 ## About the Project
+This project implements the Simplex algorithm, a widely used method for solving linear programming problems. Linear programming involves optimizing a linear objective function, subject to a set of linear inequality constraints. The Simplex algorithm iteratively improves the solution until an optimal solution is reached.
 
-**TODO:** напиши сюда, как правильно жмякать на кнопки
+## Run
+
+1. Switch to the main branch.
+2. Run main.cpp.
+3. Follow the instructions provided by the program to input the necessary problem parameters and constraints.
+
 
 ## Testing
 
