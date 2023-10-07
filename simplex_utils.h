@@ -13,7 +13,12 @@
 /** Function for printing errors */
 
 void impossible_case(const std::string& msg) {
-    std::cout << "It is impossible to use Simplex method!\n";
+    std::cout << "The method is not applicable!\n";
+    std::cout << msg << std::endl;
+}
+
+void impossible_case(std::string&& msg) {
+    std::cout << "The method is not applicable!\n";
     std::cout << msg << std::endl;
 }
 
@@ -67,7 +72,7 @@ void set_presentation(Matrix& matrix, const int number_of_vars, const int number
 
 /** Input stage and considering impossible cases */
 
-[[nodiscard]] std::optional<std::tuple<Matrix, int, int, bool>> read_SM() {
+[[nodiscard]] std::optional<std::tuple<Matrix, int, int, bool, int>> read_SM() {
     std::cout << "How many variables are in the task?\n";
     int number_of_vars;
     std::cin >> number_of_vars;
@@ -140,11 +145,28 @@ void set_presentation(Matrix& matrix, const int number_of_vars, const int number
         matrix.table[i][matrix.m - 2] = RHS;
     }
 
+    std::cout << "Enter approximation accuracy (the number of values after the floating point, e.g., 2)\n";
+
+    int eps;
+    std::cin >> eps;
+
+    if (eps < 0) {
+        impossible_case(std::string("Approximation accuracy is less than zero"));
+        return std::nullopt;
+    }
+
     set_basic_vars(matrix, number_of_vars);
     set_presentation(matrix, number_of_vars, number_of_equations);
-
     std::cout << std::endl;
-    return std::make_optional(std::make_tuple(matrix, number_of_vars, number_of_equations, is_max_problem));
+
+    return std::make_optional(
+            std::make_tuple(
+                    matrix,
+                    number_of_vars,
+                    number_of_equations,
+                    is_max_problem, eps
+            )
+    );
 }
 
 /** Function for finding min coefficients in z-row */
@@ -252,7 +274,8 @@ void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos
         Matrix&& table,
         const int number_of_vars,
         const bool is_max_problem,
-        const bool verbose = true
+        const bool verbose = true,
+        const int eps = 2
 ) {
     int iteration = 0;
 
@@ -282,7 +305,7 @@ void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos
         }
     }
 
-    Simplex answer(number_of_vars);
+    Simplex answer(number_of_vars, eps);
     substitute_into_answer(answer, table, is_max_problem);
     return std::make_optional(answer);
 }
@@ -293,8 +316,8 @@ void swap_basic_var(Matrix& matrix, const int old_var_pos, const int new_var_pos
     if (!matrix_opt.has_value())
         return std::nullopt;
 
-    auto [matrix, number_of_vars, number_of_equations, is_max_problem] = matrix_opt.value();
-    return calculate_answer(std::move(matrix), number_of_vars, is_max_problem);
+    auto [matrix, number_of_vars, number_of_equations, is_max_problem, eps] = matrix_opt.value();
+    return calculate_answer(std::move(matrix), number_of_vars, is_max_problem, false, eps);
 }
 
 #endif //OPTIMIZATION_SIMPLEX_UTILS_H

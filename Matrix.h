@@ -51,11 +51,10 @@ struct Matrix {
             out << matrix.list_of_basic_vars[counter++] << "\t";
 
             for (double j : i)
-                out
-                << std::setprecision(NUMBERS_AFTER_DOT)
-                << std::fixed
-                << (std::abs(j) < MIN_COUT ? ZERO : j)
-                << "\t";
+                out << std::setprecision(NUMBERS_AFTER_DOT)
+                    << std::fixed
+                    << (std::abs(j) < MIN_COUT ? ZERO : j)
+                    << "\t";
 
             out << std::endl << std::endl;
         }
