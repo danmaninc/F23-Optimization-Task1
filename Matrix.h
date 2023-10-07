@@ -10,7 +10,7 @@ const double MIN_COUT = 0.05;
 
 const double ZERO = 0;
 
-const int NUMBERS_AFTER_DOT = 1;
+const int NUMBERS_AFTER_DOT = 2;
 
 struct Matrix {
     std::size_t n;
@@ -40,9 +40,9 @@ struct Matrix {
 
     friend std::ostream& operator<<(std::ostream& out, const Matrix& matrix) {
         out << matrix.list_of_all_vars[0] << " " << "\t";
-        for (int i = 1; i < matrix.list_of_all_vars.size(); i++) {
+
+        for (int i = 1; i < matrix.list_of_all_vars.size(); i++)
             out << matrix.list_of_all_vars.at(i) << " " << "\t";
-        }
 
         out << std::endl;
         int counter = 0;
@@ -52,10 +52,10 @@ struct Matrix {
 
             for (double j : i)
                 out
-                << std::setprecision(NUMBERS_AFTER_DOT)
-                << std::fixed
-                << (std::abs(j) < MIN_COUT ? ZERO : j)
-                << "\t";
+                        << std::setprecision(NUMBERS_AFTER_DOT)
+                        << std::fixed
+                        << (std::abs(j) < MIN_COUT ? ZERO : j)
+                        << "\t";
 
             out << std::endl << std::endl;
         }

@@ -1,0 +1,10 @@
+{
+  "number_of_vars": 2,
+  "number_of_equations": 2,
+  "problem": "max",
+  "z_row": [1, 1],
+  "matrix": [
+    [-1, 1, 5],
+    [-1, 1, 3]
+  ]
+}
